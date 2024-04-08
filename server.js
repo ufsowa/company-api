@@ -2,21 +2,20 @@ const express = require('express');
 const cors = require('cors');
 
 const mongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose');
 
 const employeesRoutes = require('./routes/employees.routes');
 const departmentsRoutes = require('./routes/departments.routes');
 const productsRoutes = require('./routes/products.routes');
 
-
-
-mongoClient.connect('mongodb://127.0.0.1:27017', { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
-  console.log('Connect db')
-  if (err){
-    console.log(err);
-  }
-  else {
-    console.log('Successfully connected to the database');
-    const db = client.db('companyDB');
+// mongoClient.connect('mongodb://127.0.0.1:27017', { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
+//   console.log('Connect db')
+//   if (err){
+//     console.log(err);
+//   }
+//   else {
+//     console.log('Successfully connected to the database');
+//     const db = client.db('companyDB');
 
     const app = express();
 
@@ -24,10 +23,10 @@ mongoClient.connect('mongodb://127.0.0.1:27017', { useNewUrlParser: true, useUni
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
 
-    app.use((req, res, next) => {
-      req.db = db;
-      next();
-    });
+    // app.use((req, res, next) => {
+    //   req.db = db;
+    //   next();
+    // });
 
     app.use('/api', employeesRoutes);
     app.use('/api', departmentsRoutes);
@@ -36,11 +35,20 @@ mongoClient.connect('mongodb://127.0.0.1:27017', { useNewUrlParser: true, useUni
     app.use((req, res) => {
       res.status(404).send({ message: 'Not found...' });
     })
+
+    // connects our backend code with the database
+    mongoose.connect('mongodb://0.0.0.0:27017/companyDB', { useNewUrlParser: true, useUnifiedTopology: true });
+    const db = mongoose.connection;
+
+    db.once('open', () => {
+      console.log('Connected to the database');
+    });
+    db.on('error', err => console.log('Error ' + err));
     
     app.listen('8000', () => {
       console.log('Server is running on port: 8000');
     });
 
     
-  }
-});
+//  }
+//});
