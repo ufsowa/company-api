@@ -38,7 +38,7 @@ exports.addItem = async (req, res) => {
       const { name } = req.body;
       const newDepartment = new Department({ name: name });   // create item/document for model Department
       const addedItem = await newDepartment.save();                             // add item to the collection with the same model -> departments
-      res.json(addedItem);
+      res.json({message: 'OK'});
     } catch(err) {
       res.status(500).json({ message: err });
     }
@@ -63,6 +63,7 @@ exports.updateItem = async (req, res) => {
 exports.deleteItem = async (req, res) => {
     try {
       const dep = await Department.findById(req.params.id);
+      console.log('delete? ', dep)
       if(dep) {
         await Department.deleteOne({ _id: req.params.id });
         //  await department.remove();    // another way to remove item
